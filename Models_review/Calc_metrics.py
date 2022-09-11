@@ -13,8 +13,8 @@ PATH_TO_DATASETS = ''
 
 def parse_opt():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--data-for-calc', type=str, default='Data/VK_exp_1',
-                        help='path data with ground truth and preds')
+    parser.add_argument('--data-for-calc', type=str, default='ALL',
+                        help='path data with ground truth and preds [ALL, Data/MOT20, Data/VK_exp_1]')
     opt = parser.parse_args()
     return opt
 
@@ -111,11 +111,22 @@ def calc_metrics(gt_files_paths, model_to_pred_dict):
         return summary
 
 
-def main(opt):
+def logic(opt):
     gt_files_paths = get_list_gt_objects(opt)
     model_to_pred_dict = get_models_predicts_files(opt, gt_files_paths)
     metrics = calc_metrics(gt_files_paths, model_to_pred_dict)
-    print(metrics.T)
+    return metrics.T
+
+
+def main(opt):
+    if opt.data_for_calc == 'ALL':
+        for data_for_calc in ['Data/MOT20', 'Data/VK_exp_1']:
+            opt.data_for_calc = data_for_calc
+            metrics = logic(opt)
+            print(metrics)
+    else:
+        metrics = logic(opt)
+        print(metrics)
 
 
 if __name__ == "__main__":
